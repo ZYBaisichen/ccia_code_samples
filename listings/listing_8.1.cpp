@@ -66,11 +66,11 @@ struct sorter
             threads.push_back(std::thread(&sorter<T>::sort_thread,this));
         }
 
-        std::list<T> new_higher(do_sort(chunk_data));
+        std::list<T> new_higher(do_sort(chunk_data)); //在这里递归了
 
         result.splice(result.end(),new_higher);
         while(new_lower.wait_for(std::chrono::seconds(0)) !=
-              std::future_status::ready)
+              std::future_status::ready) //在这里也触发了递归
         {
             try_sort_chunk();
         }
