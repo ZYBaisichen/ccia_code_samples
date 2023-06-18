@@ -23,7 +23,7 @@ public:
     {
         typedef std::result_of<FunctionType()>::type result_type;
         
-        std::packaged_task<result_type()> task(f);
+        std::packaged_task<result_type()> task(f); //传递给线程池子队列的为一个对象，即一个任务
         std::future<result_type> res(task.get_future());
         if(local_work_queue)
         {

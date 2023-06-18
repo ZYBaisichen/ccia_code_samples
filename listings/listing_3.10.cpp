@@ -17,7 +17,7 @@ public:
     {
         if(&lhs==&rhs)
             return true;
-        int const lhs_value=lhs.get_detail();
+        int const lhs_value=lhs.get_detail(); //比较A的某一时刻和B的另一时刻的值是否相等，同一时间只会只有一个锁
         int const rhs_value=rhs.get_detail();
         return lhs_value==rhs_value;
     }

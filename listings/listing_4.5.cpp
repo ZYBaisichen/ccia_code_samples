@@ -7,7 +7,7 @@ template<typename T>
 class threadsafe_queue
 {
 private:
-    mutable std::mutex mut;
+    mutable std::mutex mut; //因为锁的操作会对互斥做修改，所以需要声明成mutable形式的
     std::queue<T> data_queue;
     std::condition_variable data_cond;
 public:

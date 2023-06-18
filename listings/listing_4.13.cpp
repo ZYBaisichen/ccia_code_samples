@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-06-04 23:48:28
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <list>
 #include <algorithm>
 #include <future>
@@ -21,6 +28,6 @@ std::list<T> parallel_quick_sort(std::list<T> input)
     auto new_higher(
         parallel_quick_sort(std::move(input)));
     result.splice(result.end(),new_higher);
-    result.splice(result.begin(),new_lower.get());
+    result.splice(result.begin(),new_lower.get()); //异步获取求值结果
     return result;
 }

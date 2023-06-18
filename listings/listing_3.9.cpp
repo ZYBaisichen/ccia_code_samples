@@ -20,7 +20,7 @@ public:
             return;
         std::unique_lock<std::mutex> lock_a(lhs.m,std::defer_lock);
         std::unique_lock<std::mutex> lock_b(rhs.m,std::defer_lock);
-        std::lock(lock_a,lock_b);
+        std::lock(lock_a,lock_b); //灵活加锁，初始化时不加锁，这种灵活性有一定的内存成本
         swap(lhs.some_detail,rhs.some_detail);
     }
 };

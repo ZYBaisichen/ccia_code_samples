@@ -36,5 +36,5 @@ std::future<void> post_task_for_gui_thread(Func f)
     std::future<void> res=task.get_future();
     std::lock_guard<std::mutex> lk(m);
     tasks.push_back(std::move(task));
-    return res;
+    return res; //返回给外部代码，假设本类是一个任务分发器，就可以将任务给线程池；可以获得结果的句柄给到调用方
 }

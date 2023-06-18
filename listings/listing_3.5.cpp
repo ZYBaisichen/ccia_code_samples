@@ -22,7 +22,7 @@ public:
     threadsafe_stack(){}
     threadsafe_stack(const threadsafe_stack& other)
     {
-        std::lock_guard<std::mutex> lock(other.m);
+        std::lock_guard<std::mutex> lock(other.m); //这里加锁保证初始化完成
         data=other.data;
     }
     threadsafe_stack& operator=(const threadsafe_stack&) = delete;
@@ -42,7 +42,7 @@ public:
     }
     void pop(T& value)
     {
-        std::lock_guard<std::mutex> lock(m);
+        std::lock_guard<std::mutex> lock(m);  //朴素的锁，这里粒度比较大。但是必须的 
         if(data.empty()) throw empty_stack();
         value=data.top();
         data.pop();

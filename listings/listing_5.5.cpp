@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-06-17 10:53:54
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <atomic>
 #include <thread>
 #include <assert.h>
@@ -13,8 +20,8 @@ void write_x_then_y()
 
 void read_y_then_x()
 {
-    while(!y.load(std::memory_order_relaxed));
-    if(x.load(std::memory_order_relaxed))
+    while(!y.load(std::memory_order_relaxed)); 
+    if(x.load(std::memory_order_relaxed)) //这里可能会直接读自己cacheline中的值，因为宽松次序下不会处理写内存屏障；任一存储操作与任一载入操作之间均不存在先行关系
         ++z;
 }
 
