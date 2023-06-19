@@ -1,10 +1,3 @@
-/*** 
- * @Author: baisichen
- * @Date: 2023-04-26 16:40:32
- * @LastEditTime: 2023-06-17 10:53:54
- * @LastEditors: baisichen
- * @Description: 
- */
 #include <atomic>
 #include <thread>
 #include <assert.h>

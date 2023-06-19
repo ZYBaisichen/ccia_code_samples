@@ -16,7 +16,7 @@ private:
         return tail;
     }
 
-    std::unique_ptr<node> pop_head()
+    std::unique_ptr<node> pop_head() //移除头结点改动队列
     {
         std::unique_ptr<node> const old_head=std::move(head);
         head=std::move(old_head->next);
@@ -26,7 +26,7 @@ private:
     std::unique_lock<std::mutex> wait_for_data()
     {
         std::unique_lock<std::mutex> head_lock(head_mutex);
-        data_cond.wait(head_lock,[&]{return head!=get_tail();});
+        data_cond.wait(head_lock,[&]{return head!=get_tail();}); //非常巧妙的既等待了cond条件变量，又在条件变量唤醒之后及时锁住head_lock, 同时在调用get_tail的时候保证了head_mutex锁住，从而让tail锁的获取在head锁的保护之内
         return std::move(head_lock);
     }
 

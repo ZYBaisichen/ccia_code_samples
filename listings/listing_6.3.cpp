@@ -3,6 +3,8 @@
 #include <condition_variable>
 #include <memory>
 
+//同样这个数据结构是将整个队列看成一个整体数据结构，只有一个锁在保护，降低了并发的效率
+
 template<typename T>
 class threadsafe_queue
 {
@@ -42,7 +44,7 @@ public:
 
     std::shared_ptr<T> try_pop()
     {
-        std::lock_guard<std::mutex> lk(mut);
+        std::lock_guard<std::mutex> lk(mut); 
         if(data_queue.empty())
             return std::shared_ptr<T>();
         std::shared_ptr<T> res=data_queue.front();
@@ -59,7 +61,7 @@ public:
     void push(T new_value)
     {
         std::shared_ptr<T> data(
-            std::make_shared<T>(std::move(new_value)));
+            std::make_shared<T>(std::move(new_value)));//因为这里是用shared_ptr，使用了移动语义，且多线程竞争移动赋值时因为shared_ptr的特性，只会有一个竞争成功，可以将其移除锁保护之外，减小了锁的粒度，提高了效率
         std::lock_guard<std::mutex> lk(mut);
         data_queue.push(data);
         data_cond.notify_one();

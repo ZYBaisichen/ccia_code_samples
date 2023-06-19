@@ -41,10 +41,12 @@ private:
             bucket_iterator const found_entry=find_entry_for(key);
             if(found_entry==data.end())
             {
+                //异常安全：即便抛出异常也能保持数据不变(这也是异常安全的一个最重要的理解)
                 data.push_back(bucket_value(key,value));
             }
             else
             {
+                //这里赋值构造可能会产生异常，如果产生异常有可能原值未动或改变了一部分，但对整体数据结构没有影响，可以留待使用者处理异常情况
                 found_entry->second=value;
             }
         }
@@ -91,6 +93,7 @@ public:
     Value value_for(Key const& key,
         Value const& default_value=Value()) const
     {
+        //以桶为单位并行 
         return get_bucket(key).value_for(key,default_value);
     }
     
