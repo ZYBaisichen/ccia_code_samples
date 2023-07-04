@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-07-03 11:59:40
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <iterator>
 #include <vector>
 #include <thread>
@@ -8,6 +15,16 @@ struct join_threads
 {
     join_threads(std::vector<std::thread>&)
     {}
+    ~join_threads() //C++惯用手法，在析构的时候做一些事情，这里是join，确保退出时所有的线程都汇合到主线程
+    {
+        for (unsigned long int i=0;i<threads.size();++i) {
+            if(threads[i].joinable()) {
+                threads[i].join();
+            }
+        }
+    }
+public:
+    std::vector<std::thread> threads;
 };
     
 template<typename Iterator,typename T>

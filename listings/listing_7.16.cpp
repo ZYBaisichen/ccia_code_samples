@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-06-25 17:20:19
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <atomic>
 #include <memory>
 template<typename T>

@@ -7,12 +7,13 @@ struct join_threads
     {}
 };
 
+//此线程池子可以完成基本的功能，适合的场景：彼此完全独立，也没有任何返回值、且不执行阻塞操作。
 class thread_pool
 {
-    std::atomic_bool done;
+    std::atomic_bool done; 
     thread_safe_queue<std::function<void()> > work_queue;
     std::vector<std::thread> threads;
-    join_threads joiner;
+    join_threads joiner; //这里的声明顺序需要确定，done最前面，joiner在最后，确保销毁done前joiner析构，从而确保所有线程可以正确结束
 
     void worker_thread()
     {

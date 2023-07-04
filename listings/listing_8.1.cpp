@@ -63,16 +63,16 @@ struct sorter
         chunks.push(std::move(new_lower_chunk));
         if(threads.size()<max_thread_count)
         {
-            threads.push_back(std::thread(&sorter<T>::sort_thread,this));
+            threads.push_back(std::thread(&sorter<T>::sort_thread,this)); //sort_thread中不断从栈中取出数据出来排序
         }
 
         std::list<T> new_higher(do_sort(chunk_data)); //在这里递归了
 
         result.splice(result.end(),new_higher);
         while(new_lower.wait_for(std::chrono::seconds(0)) !=
-              std::future_status::ready) //在这里也触发了递归
+              std::future_status::ready) //等待lower这个数据段的排序结果返回
         {
-            try_sort_chunk();
+            try_sort_chunk(); //当还没有就绪时，为了避免CPU盲等，试着处理别的线程
         }
 
         result.splice(result.begin(),new_lower.get());

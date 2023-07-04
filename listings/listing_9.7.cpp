@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-07-04 11:56:05
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <deque>
 #include <mutex>
 #include <memory>
@@ -78,7 +85,7 @@ public:
         return true;
     }
 
-    bool try_steal(data_type& res)
+    bool try_steal(data_type& res) //try_steal操作队列尾部，try_pop操作队列头，从而减少竞争
     {
         std::lock_guard<std::mutex> lock(the_mutex);
         if(the_queue.empty())
@@ -86,7 +93,7 @@ public:
             return false;
         }
         
-        res=std::move(the_queue.back());
+        res=std::move(the_queue.back()); //从给队尾窃取任务
         the_queue.pop_back();
         return true;
     }

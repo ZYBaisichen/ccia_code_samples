@@ -56,6 +56,7 @@ void parallel_partial_sum(Iterator first,Iterator last)
         void operator()(Iterator first,Iterator last,
                         std::vector<value_type>& buffer,
                         unsigned i,barrier& b)
+        //这个函数内如果有异常会终止整个程序。可以再加一些promis和future传播异常
         {
             value_type& ith_element=*(first+i);
             bool update_source=false;
@@ -67,12 +68,12 @@ void parallel_partial_sum(Iterator first,Iterator last)
                 value_type const& source=(step%2)?
                     buffer[i]:ith_element; //上次读了buffer，这次就读原数组的元素
                 value_type& dest=(step%2)?
-                    ith_element:buffer[i]; //上次写了原数组的元素，这次就写buffer
+                    ith_element:buffer[i]; //上次写了原数组的元素，这次就写buffer AB缓存
                 value_type const& addend=(step%2)?
                     buffer[i-stride]:*(first+i-stride);
                 dest=source+addend;
                 update_source=!(step%2);
-                b.wait();
+                b.wait(); //每次加完之后都要等待其他线程也处理完，才能保证下一个步骤stride*=2能取到最新的值。
             }
             if(update_source)
             {
@@ -89,11 +90,11 @@ void parallel_partial_sum(Iterator first,Iterator last)
 
     std::vector<value_type> buffer(length);
     barrier b(length);
-    std::vector<std::thread> threads(length-1);
+    std::vector<std::thread> threads(length-1); //元素数量有多少就开多少线程
     join_threads joiner(threads);
 
     Iterator block_start=first;
-    for(unsigned long i=0;i<( -1);++i)
+    for(unsigned long i=0;i<(length-1);++i)
     {
         threads[i]=std::thread(process_element(),first,last,
                                std::ref(buffer),i,std::ref(b));

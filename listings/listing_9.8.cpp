@@ -36,8 +36,10 @@ class thread_pool
 
     bool pop_task_from_other_thread_queue(task_type& task)
     {
+        //逐个遍历其他线程局部队列，看是否能拿到任务
         for(unsigned i=0;i<queues.size();++i)
         {
+            //每次都是从当前线程id的下一个线程开始检查窃取，避免所有的都从第一个线程开始检查
             unsigned const index=(my_index+i+1)%queues.size();
             if(queues[index]->try_steal(task))
             {
@@ -58,8 +60,9 @@ public:
         {
             for(unsigned i=0;i<thread_count;++i)
             {
+                //将所有本地队列维护在一个数组中。线程池代为分配局部任务队列
                 queues.push_back(std::unique_ptr<work_stealing_queue>(
-                                     new work_stealing_queue));
+                                     new work_stealing_queue)); 
                 threads.push_back(
                     std::thread(&thread_pool::worker_thread,this,i));
             }

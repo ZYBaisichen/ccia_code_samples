@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-06-25 15:02:02
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <memory>
 #include <atomic>
 template<typename T>
@@ -26,7 +33,7 @@ public:
                 ptr->release_ref();
                 return std::unique_ptr<T>();
             }
-            if(head.compare_exchange_strong(old_head,ptr->next))
+            if(head.compare_exchange_strong(old_head,ptr->next)) //这句话更多的作用感觉是将head原子的收为己有
             {
                 T* const res=ptr->data.exchange(nullptr);
                 free_external_counter(old_head);

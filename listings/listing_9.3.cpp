@@ -11,7 +11,7 @@ T parallel_accumulate(Iterator first,Iterator last,T init)
         return init;
 
     unsigned long const block_size=25;
-    unsigned long const num_blocks=(length+block_size-1)/block_size;
+    unsigned long const num_blocks=(length+block_size-1)/block_size; //通过它来控制值得并行的最小块数
 
     std::vector<std::future<T> > futures(num_blocks-1);
     thread_pool pool;
@@ -21,14 +21,14 @@ T parallel_accumulate(Iterator first,Iterator last,T init)
     {
         Iterator block_end=block_start;
         std::advance(block_end,block_size);
-        futures[i]=pool.submit(accumulate_block<Iterator,T>());
+        futures[i]=pool.submit(accumulate_block<Iterator,T>()); //每提交一次，将future句柄返回
         block_start=block_end;
     }
     T last_result=accumulate_block()(block_start,last);
     T result=init;
     for(unsigned long i=0;i<(num_blocks-1);++i)
     {
-        result+=futures[i].get();
+        result+=futures[i].get(); //这里等待所有的future就绪。如果发生了异常，同样会通过future向外传播
     }
     result += last_result;
     return result;

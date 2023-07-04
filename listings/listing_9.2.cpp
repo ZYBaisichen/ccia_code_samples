@@ -5,7 +5,7 @@
 #include <iostream>
 #include <iostream>
 
-class function_wrapper
+class function_wrapper //包装成了任务类，可以拷贝也可以移动。
 {
     struct impl_base {
         virtual void call()=0;
@@ -44,19 +44,29 @@ public:
 
 class thread_pool
 {
-public:
-    std::deque<function_wrapper> work_queue;
 
+public:
+    std::deque<function_wrapper> work_queue; //这里使用wrapper
+    /*
+    void worker_thread() {
+        function_wrapper task;
+        if (work_queue.try_pop(task)) {
+            task();
+        } else {
+            std::this_thread::yield();
+        }
+
+    }*/
     template<typename FunctionType>
     std::future<typename std::result_of<FunctionType()>::type>
-    submit(FunctionType f)
+    submit(FunctionType f) //调用submit后会返回一个future实例。std::result_of<FunctionType()>::type可以返回FunctionType函数的返回型别
     {
         typedef typename std::result_of<FunctionType()>::type result_type;
         
         std::packaged_task<result_type()> task(std::move(f));
         std::future<result_type> res(task.get_future());
         work_queue.push_back(std::move(task));
-        return res;
+        return res; //将future句柄返回
     }
     // rest as before
 };

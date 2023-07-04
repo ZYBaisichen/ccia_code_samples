@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-06-28 21:23:12
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 template<typename T>
 class lock_free_queue
 {
@@ -11,6 +18,7 @@ private:
         node_counter new_counter;
         do
         {
+            //这三句话更新了内部计数器和外部计数器, 整体是一个部分放在了compare_exchange_strong的while循环里
             new_counter=old_counter;
             --new_counter.external_counters;
             new_counter.internal_count+=count_increase;

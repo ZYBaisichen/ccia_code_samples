@@ -24,11 +24,11 @@ void parallel_partial_sum(Iterator first,Iterator last)
                 std::partial_sum(begin,end,begin);
                 if(previous_end_value)
                 {
-                    value_type& addend=previous_end_value->get();
+                    value_type& addend=previous_end_value->get(); //这里会等待前一个线程的结果准备完毕
                     *last+=addend;
                     if(end_value)
                     {
-                        end_value->set_value(*last);
+                        end_value->set_value(*last); //先更新本段的末尾值，避免阻塞其他线程，提高并发程度
                     }
                     std::for_each(begin,last,[addend](value_type& item)
                                   {
@@ -61,7 +61,7 @@ void parallel_partial_sum(Iterator first,Iterator last)
 
     unsigned long const min_per_thread=25;
     unsigned long const max_threads=
-        (length+min_per_thread-1)/min_per_thread;
+        (length+min_per_thread-1)/min_per_thread; //向上取整
 
     unsigned long const hardware_threads=
         std::thread::hardware_concurrency();
@@ -75,7 +75,7 @@ void parallel_partial_sum(Iterator first,Iterator last)
 
     std::vector<std::thread> threads(num_threads-1);
     std::vector<std::promise<value_type> >
-        end_values(num_threads-1);
+        end_values(num_threads-1); //存储各个段上的末尾值
     std::vector<std::future<value_type> >
         previous_end_values;
     previous_end_values.reserve(num_threads-1);
@@ -85,14 +85,14 @@ void parallel_partial_sum(Iterator first,Iterator last)
     for(unsigned long i=0;i<(num_threads-1);++i)
     {
         Iterator block_last=block_start;
-        std::advance(block_last,block_size-1);
+        std::advance(block_last,block_size-1); //分成每一段
         threads[i]=std::thread(process_chunk(),
                                block_start,block_last,
-                               (i!=0)?&previous_end_values[i-1]:0,
+                               (i!=0)?&previous_end_values[i-1]:0, //传前一个线程的endvalues
                                &end_values[i]);
         block_start=block_last;
         ++block_start;
-        previous_end_values.push_back(end_values[i].get_future());
+        previous_end_values.push_back(end_values[i].get_future()); //保存当前数据段的末尾值
     }
     Iterator final_element=block_start;
     std::advance(final_element,std::distance(block_start,last)-1);

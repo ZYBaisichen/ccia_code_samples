@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-07-03 15:46:29
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <future>
 #include <algorithm>
 struct join_threads
@@ -6,8 +13,9 @@ struct join_threads
     {}
 };
 
+//这里找到的元素并不一定是出现在数组中的第一个，所以和find函数还是有一定的差异
 template<typename Iterator,typename MatchType>
-Iterator parallel_find(Iterator first,Iterator last,MatchType match)
+Iterator parallel_find(Iterator first,Iterator last,MatchType match) 
 {
     struct find_element
     {
@@ -18,12 +26,12 @@ Iterator parallel_find(Iterator first,Iterator last,MatchType match)
         {
             try
             {
-                for(;(begin!=end) && !done_flag->load();++begin)
+                for(;(begin!=end) && !done_flag->load();++begin) //每次itor迭代都会判断一次done_flag标记，一定程度上会减缓当前线程的执行速度。
                 {
                     if(*begin==match)
                     {
                         result->set_value(begin);
-                        done_flag->store(true);
+                        done_flag->store(true); //找到设置标记，中断其他线程
                         return;
                     }
                 }
@@ -33,9 +41,9 @@ Iterator parallel_find(Iterator first,Iterator last,MatchType match)
                 try
                 {
                     result->set_exception(std::current_exception());
-                    done_flag->store(true);
+                    done_flag->store(true); //抛出异常的话也做中断。
                 }
-                catch(...)
+                catch(...) //如果设置原子变量的过程中已经被其他线程设置，则会抛出异常；此时则不处理直接跳过
                 {}
             }
         }
@@ -62,7 +70,7 @@ Iterator parallel_find(Iterator first,Iterator last,MatchType match)
     std::atomic<bool> done_flag(false);
     std::vector<std::thread> threads(num_threads-1);
     {
-        join_threads joiner(threads);
+        join_threads joiner(threads); //离开当前作用域后就会在析构中调用join
 
         Iterator block_start=first;
         for(unsigned long i=0;i<(num_threads-1);++i)
@@ -80,6 +88,6 @@ Iterator parallel_find(Iterator first,Iterator last,MatchType match)
     {
         return last;
     }
-    return result.get_future().get();
+    return result.get_future().get(); //如果找不到却没有join，也没有判断done_flag的话，这里就会一直等待；
 }
 

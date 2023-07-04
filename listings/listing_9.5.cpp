@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-07-04 11:24:55
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <list>
 #include <algorithm>
 #include <vector>
@@ -40,7 +47,7 @@ struct sorter
         result.splice(result.end(),new_higher);
         while(!new_lower.is_ready())
         {
-            pool.run_pending_task();
+            pool.run_pending_task(); //对比8.1，这里就简单很多，实现的是同样避免盲等的功能，这里全权交给了线程池
         }
         
         result.splice(result.begin(),new_lower.get());

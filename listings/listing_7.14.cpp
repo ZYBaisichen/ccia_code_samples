@@ -50,13 +50,15 @@ public:
         delete old_head;
         return res;
     }
+    //相较于无锁栈，push和pop是只对head做操作，所以只有一个引用计数即可解决所有的内存回收问题
+    //而无锁队列有两个指针head和tail，这样就会复杂了，要有一个引用计数表示head出队，还要有一个引用计数作用于tail上
     void push(T new_value)
     {
         std::shared_ptr<T> new_data(std::make_shared<T>(new_value));
         node* p=new node;
         node* const old_tail=tail.load();
         old_tail->data.swap(new_data);
-        old_tail->next=p;
-        tail.store(p);
+        old_tail->next=p; 
+        tail.store(p); //直接store的话其他线程可能会抢先执行，造成失败。
     }
 };
