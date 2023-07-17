@@ -14,7 +14,7 @@ void test_concurrent_push_and_pop_on_empty_queue()
                              [&q,ready,&push_ready]()
                              {
                                  push_ready.set_value();
-                                 ready.wait();
+                                 ready.wait(); //同时在go上等待
                                  q.push(42);
                              }
             );
@@ -26,9 +26,9 @@ void test_concurrent_push_and_pop_on_empty_queue()
                                 return q.pop();
                             }
             );
-        push_ready.get_future().wait();
-        pop_ready.get_future().wait();
-        go.set_value();
+        push_ready.get_future().wait(); //等待push线程就绪
+        pop_ready.get_future().wait(); //等待pop线程就绪
+        go.set_value(); //两个线程就绪后才发送运行信号
 
         push_done.get();
         assert(pop_done.get()==42);

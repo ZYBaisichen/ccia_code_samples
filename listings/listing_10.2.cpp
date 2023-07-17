@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-07-05 19:55:50
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 class Y{
     int data;
 public:
@@ -28,6 +35,6 @@ void increment_all(ProtectedY& data){
     auto& v=data.get_vec();
     std::for_each(std::execution::par_unseq,v.begin(),v.end(),
         [](Y& y){
-            y.increment();
+            y.increment(); //类内部采用lock保护整个vector，所以可以使用std::execution::par_unseq
         });
 }

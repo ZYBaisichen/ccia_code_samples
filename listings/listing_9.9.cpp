@@ -1,3 +1,10 @@
+/*** 
+ * @Author: baisichen
+ * @Date: 2023-04-26 16:40:32
+ * @LastEditTime: 2023-07-04 13:26:34
+ * @LastEditors: baisichen
+ * @Description: 
+ */
 #include <thread>
 #include <future>
 #include <mutex>
@@ -50,7 +57,7 @@ public:
             });
         flag=p.get_future().get();
     }
-    void interrupt()
+    void interrupt() //只要有指向中断标志的合法指针，且目标线程确实需要中断，就设置标志成立
     {
         if(flag)
         {
