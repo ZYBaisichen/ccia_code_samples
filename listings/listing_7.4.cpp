@@ -15,7 +15,7 @@ public:
         while(old_head &&
               !head.compare_exchange_weak(old_head,old_head->next));
         std::shared_ptr<T> res;
-        if(old_head)
+        if(old_head) //双重验证
         {
             res.swap(old_head->data);
         }
