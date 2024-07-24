@@ -11,9 +11,9 @@ struct data_to_reclaim
     std::function<void(void*)> deleter;
     data_to_reclaim* next;
     template<typename T>
-    data_to_reclaim(T* p):
-        data(p),
-        deleter(&do_delete<T>),
+    data_to_reclaim(T* p): 
+        data(p), //将待删除数据的指针看成void*型别，放在data中。
+        deleter(&do_delete<T>), //实际的删除操作由do_delete来干
         next(0)
     {}
     ~data_to_reclaim()

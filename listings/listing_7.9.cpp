@@ -1,4 +1,5 @@
 template<typename T>
+//只有在极少数的C++程序库中，shared_ptr才会提供无锁原子操作， shared_ptr<T>不具备平时拷贝语义，所以不能搭配std::atomic使用。
 class lock_free_stack
 {
 private:

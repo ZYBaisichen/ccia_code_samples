@@ -31,8 +31,9 @@ public:
     {
         counted_node_ptr new_node;
         new_node.ptr=new node(data);
-        new_node.external_count=1; //初始外部计数器为1，表示有一个指向它的指针
+        new_node.external_count=1; //初始外部计数器为1，表示有一个指向它的指针，就是head。
+        //相当于将next指针封装了起来，所谓外部指针其实就是外面有多少个next指向它。
         new_node.ptr->next=head.load();
-        while(!head.compare_exchange_weak(new_node.ptr->next,new_node));
+        while(!head.compare_exchange_weak(new_node.ptr->next,new_node)); 
     }
 };
